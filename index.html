@@ -26,7 +26,7 @@
             margin-bottom: 20px;
         }
         #instructions {
-            display: none; /* Escondendo as instruções */
+            display: none;
         }
         #grid {
             display: grid;
@@ -119,21 +119,29 @@
     </style>
 </head>
 <body>
-    <h1>J ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
-            <script>
+    <h1>Jogo de Mapas da Peach</h1>
+    <div id="moves">Movimentos: 0</div>
+    <div id="instructions"></div>
+    <div id="grid"></div>
+    <div id="controls">
+        <button class="move-btn" onclick="movePeach('up')">Cima</button>
+        <button class="move-btn" onclick="movePeach('down')">Baixo</button>
+        <button class="move-btn" onclick="movePeach('left')">Esquerda</button>
+        <button class="move-btn" onclick="movePeach('right')">Direita</button>
+    </div>
+    <button id="restart-btn">Novo Mapa</button>
+    <div id="feedback"></div>
+    <script>
         const gridSize = 5;
         const locations = ["CASA", "RIO", "PARQUE", "FLOR", "SOL"];
         let peachRow, peachCol, destRow, destCol;
         let moves = 0;
         let gameOver = false;
 
-        // Inicializa o jogo
         function initializeGame() {
-            // Posição inicial aleatória da Peach
             peachRow = Math.floor(Math.random() * gridSize);
             peachCol = Math.floor(Math.random() * gridSize);
 
-            // Posição do destino (diferente da inicial)
             do {
                 destRow = Math.floor(Math.random() * gridSize);
                 destCol = Math.floor(Math.random() * gridSize);
@@ -144,11 +152,10 @@
             document.getElementById('moves').textContent = `Movimentos: ${moves}`;
             document.getElementById('restart-btn').style.display = 'none';
             document.getElementById('feedback').style.display = 'block';
-            document.getElementById('feedback').innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">'; // Começa com "errado"
+            document.getElementById('feedback').innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
             renderGrid();
         }
 
-        // Renderiza o grid
         function renderGrid() {
             const gridElement = document.getElementById('grid');
             gridElement.innerHTML = '';
@@ -168,7 +175,6 @@
             }
         }
 
-        // Move a Peach
         function movePeach(direction) {
             if (gameOver) return;
 
@@ -179,7 +185,7 @@
             else if (direction === 'down' && peachRow < gridSize - 1) newRow++;
             else if (direction === 'left' && peachCol > 0) newCol--;
             else if (direction === 'right' && peachCol < gridSize - 1) newCol++;
-            else return; // Movimento inválido
+            else return;
 
             peachRow = newRow;
             peachCol = newCol;
@@ -187,28 +193,24 @@
             document.getElementById('moves').textContent = `Movimentos: ${moves}`;
             renderGrid();
 
-            // Verifica se chegou ao destino
             checkDestination();
         }
 
-        // Verifica se a Peach chegou ao destino
         function checkDestination() {
             const feedbackElement = document.getElementById('feedback');
             if (peachRow === destRow && peachCol === destCol) {
                 gameOver = true;
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/wN5N3mRH/IMG-1389.jpg" alt="Certo">';
                 document.getElementById('restart-btn').style.display = 'inline-block';
-                renderGrid(); // Mostra o destino
+                renderGrid();
             } else {
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
                 feedbackElement.style.display = 'block';
             }
         }
 
-        // Reinicia o jogo
         document.getElementById('restart-btn').addEventListener('click', initializeGame);
 
-        // Inicializa o jogo
         initializeGame();
     </script>
 </body>
