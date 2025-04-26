@@ -23,15 +23,10 @@
         }
         #moves {
             font-size: 1rem;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         #instructions {
-            font-size: 1rem;
-            background-color: #4B0082;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            max-width: 80%;
+            display: none; /* Escondendo as instruções */
         }
         #grid {
             display: grid;
@@ -99,7 +94,7 @@
             h1 {
                 font-size: 1.2rem;
             }
-            #moves, #instructions {
+            #moves {
                 font-size: 0.9rem;
             }
             #grid {
@@ -124,25 +119,13 @@
     </style>
 </head>
 <body>
-    <h1>Jogo de Mapas da Peach</h1>
-    <div id="moves">Movimentos: 0</div>
-    <div id="instructions">Siga as instruções!</div>
-    <div id="grid"></div>
-    <div id="controls">
-        <button class="move-btn" onclick="movePeach('up')">Cima</button>
-        <button class="move-btn" onclick="movePeach('down')">Baixo</button>
-        <button class="move-btn" onclick="movePeach('left')">Esquerda</button>
-        <button class="move-btn" onclick="movePeach('right')">Direita</button>
-    </div>
-    <button id="restart-btn">Novo Mapa</button>
-    <div id="feedback"></div>
-    <script>
+    <h1>J ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+            <script>
         const gridSize = 5;
         const locations = ["CASA", "RIO", "PARQUE", "FLOR", "SOL"];
         let peachRow, peachCol, destRow, destCol;
         let moves = 0;
         let gameOver = false;
-        let instructions = [];
 
         // Inicializa o jogo
         function initializeGame() {
@@ -160,34 +143,9 @@
             gameOver = false;
             document.getElementById('moves').textContent = `Movimentos: ${moves}`;
             document.getElementById('restart-btn').style.display = 'none';
-            document.getElementById('feedback').style.display = 'none';
-
-            // Gera instruções
-            generateInstructions();
-            document.getElementById('instructions').textContent = instructions.join(', ');
-
+            document.getElementById('feedback').style.display = 'block';
+            document.getElementById('feedback').innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">'; // Começa com "errado"
             renderGrid();
-        }
-
-        // Gera instruções para chegar ao destino
-        function generateInstructions() {
-            instructions = [];
-            let currentRow = peachRow;
-            let currentCol = peachCol;
-
-            // Calcula a diferença de posição
-            let rowDiff = destRow - currentRow;
-            let colDiff = destCol - currentCol;
-
-            // Movimentos verticais
-            if (rowDiff > 0) instructions.push(`${Math.abs(rowDiff)} passo${Math.abs(rowDiff) > 1 ? 's' : ''} para baixo`);
-            else if (rowDiff < 0) instructions.push(`${Math.abs(rowDiff)} passo${Math.abs(rowDiff) > 1 ? 's' : ''} para cima`);
-
-            // Movimentos horizontais
-            if (colDiff > 0) instructions.push(`${Math.abs(colDiff)} passo${Math.abs(colDiff) > 1 ? 's' : ''} para a direita`);
-            else if (colDiff < 0) instructions.push(`${Math.abs(colDiff)} passo${Math.abs(colDiff) > 1 ? 's' : ''} para a esquerda`);
-
-            if (instructions.length === 0) instructions.push("Você já está no destino!");
         }
 
         // Renderiza o grid
@@ -229,7 +187,7 @@
             document.getElementById('moves').textContent = `Movimentos: ${moves}`;
             renderGrid();
 
-            // Verifica se chegou ao destino após o movimento
+            // Verifica se chegou ao destino
             checkDestination();
         }
 
@@ -239,17 +197,11 @@
             if (peachRow === destRow && peachCol === destCol) {
                 gameOver = true;
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/wN5N3mRH/IMG-1389.jpg" alt="Certo">';
-                document.getElementById('instructions').textContent = 'Parabéns! Você chegou ao destino!';
                 document.getElementById('restart-btn').style.display = 'inline-block';
-                feedbackElement.style.display = 'block';
                 renderGrid(); // Mostra o destino
-            } else if (moves >= Math.abs(destRow - peachRow) + Math.abs(destCol - peachCol)) {
-                gameOver = true;
+            } else {
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
-                document.getElementById('instructions').textContent = 'Ops! Você não chegou ao destino.';
-                document.getElementById('restart-btn').style.display = 'inline-block';
                 feedbackElement.style.display = 'block';
-                renderGrid(); // Mostra o destino
             }
         }
 
