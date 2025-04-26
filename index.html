@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Jogo de Mapas da Peach</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -81,8 +81,12 @@
             cursor: pointer;
             display: none;
         }
-        #feedback {
+        #feedback-text {
+            font-size: 1rem;
             margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        #feedback {
             display: none;
         }
         #feedback img {
@@ -94,7 +98,7 @@
             h1 {
                 font-size: 1.2rem;
             }
-            #moves {
+            #moves, #feedback-text {
                 font-size: 0.9rem;
             }
             #grid {
@@ -130,13 +134,22 @@
         <button class="move-btn" onclick="movePeach('right')">Direita</button>
     </div>
     <button id="restart-btn">Novo Mapa</button>
+    <div id="feedback-text">Cadê a Peach?</div>
     <div id="feedback"></div>
-    <script>
+        <script>
         const gridSize = 5;
         const locations = ["CASA", "RIO", "PARQUE", "FLOR", "SOL"];
         let peachRow, peachCol, destRow, destCol;
         let moves = 0;
         let gameOver = false;
+
+        // Prevenir zoom nos botões em dispositivos móveis
+        document.querySelectorAll('.move-btn').forEach(button => {
+            button.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                movePeach(this.getAttribute('onclick').match(/'([^']+)'/)[1]);
+            });
+        });
 
         function initializeGame() {
             peachRow = Math.floor(Math.random() * gridSize);
@@ -151,6 +164,7 @@
             gameOver = false;
             document.getElementById('moves').textContent = `Movimentos: ${moves}`;
             document.getElementById('restart-btn').style.display = 'none';
+            document.getElementById('feedback-text').textContent = 'Cadê a Peach?';
             document.getElementById('feedback').style.display = 'block';
             document.getElementById('feedback').innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
             renderGrid();
@@ -198,12 +212,15 @@
 
         function checkDestination() {
             const feedbackElement = document.getElementById('feedback');
+            const feedbackText = document.getElementById('feedback-text');
             if (peachRow === destRow && peachCol === destCol) {
                 gameOver = true;
+                feedbackText.textContent = 'Achou!!!';
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/wN5N3mRH/IMG-1389.jpg" alt="Certo">';
                 document.getElementById('restart-btn').style.display = 'inline-block';
                 renderGrid();
             } else {
+                feedbackText.textContent = 'Cadê a Peach?';
                 feedbackElement.innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
                 feedbackElement.style.display = 'block';
             }
