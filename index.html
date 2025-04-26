@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Mapas da Peach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000000;
+            font-family: 'Poppins', sans-serif;
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        #moves {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        #instructions {
+            font-size: 1rem;
+            background-color: #4B0082;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            background-color: #4B0082;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            border-radius: 5px;
+            user-select: none;
+        }
+        .cell.peach {
+            background-color: #FFD700;
+            font-size: 1.5rem;
+        }
+        .cell.destination {
+            background-color: #FFD700;
+            font-size: 0.8rem;
+            color: #000000;
+            font-weight: 600;
+        }
+        #controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .move-btn {
+            background-color: #FF69B4;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #restart-btn {
+            background-color: #FF69B4;
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        #feedback {
+            margin-top: 20px;
+            display: none;
+        }
+        #feedback img {
+            width: 150px;
+            height: auto;
+            border-radius: 10px;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+            #moves, #instructions {
+                font-size: 0.9rem;
+            }
+            #grid {
+                grid-template-columns: repeat(5, 50px);
+            }
+            .cell {
+                width: 50px;
+                height: 50px;
+                font-size: 0.9rem;
+            }
+            .cell.peach {
+                font-size: 1.2rem;
+            }
+            .cell.destination {
+                font-size: 0.7rem;
+            }
+            .move-btn, #restart-btn {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo de Mapas da Peach</h1>
+    <div id="moves">Movimentos: 0</div>
+    <div id="instructions">Siga as instruções!</div>
+    <div id="grid"></div>
+    <div id="controls">
+        <button class="move-btn" onclick="movePeach('up')">Cima</button>
+        <button class="move-btn" onclick="movePeach('down')">Baixo</button>
+        <button class="move-btn" onclick="movePeach('left')">Esquerda</button>
+        <button class="move-btn" onclick="movePeach('right')">Direita</button>
+    </div>
+    <button id="restart-btn">Novo Mapa</button>
+    <div id="feedback"></div>
+    <script>
+        const gridSize = 5;
+        const locations = ["CASA", "RIO", "PARQUE", "FLOR", "SOL"];
+        let peachRow, peachCol, destRow, destCol;
+        let moves = 0;
+        let gameOver = false;
+        let instructions = [];
+
+        // Inicializa o jogo
+        function initializeGame() {
+            // Posição inicial aleatória da Peach
+            peachRow = Math.floor(Math.random() * gridSize);
+            peachCol = Math.floor(Math.random() * gridSize);
+
+            // Posição do destino (diferente da inicial)
+            do {
+                destRow = Math.floor(Math.random() * gridSize);
+                destCol = Math.floor(Math.random() * gridSize);
+            } while (destRow === peachRow && destCol === peachCol);
+
+            moves = 0;
+            gameOver = false;
+            document.getElementById('moves').textContent = `Movimentos: ${moves}`;
+            document.getElementById('restart-btn').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+
+            // Gera instruções
+            generateInstructions();
+            document.getElementById('instructions').textContent = instructions.join(', ');
+
+            renderGrid();
+        }
+
+        // Gera instruções para chegar ao destino
+        function generateInstructions() {
+            instructions = [];
+            let currentRow = peachRow;
+            let currentCol = peachCol;
+
+            // Calcula a diferença de posição
+            let rowDiff = destRow - currentRow;
+            let colDiff = destCol - currentCol;
+
+            // Movimentos verticais
+            if (rowDiff > 0) instructions.push(`${Math.abs(rowDiff)} passo${Math.abs(rowDiff) > 1 ? 's' : ''} para baixo`);
+            else if (rowDiff < 0) instructions.push(`${Math.abs(rowDiff)} passo${Math.abs(rowDiff) > 1 ? 's' : ''} para cima`);
+
+            // Movimentos horizontais
+            if (colDiff > 0) instructions.push(`${Math.abs(colDiff)} passo${Math.abs(colDiff) > 1 ? 's' : ''} para a direita`);
+            else if (colDiff < 0) instructions.push(`${Math.abs(colDiff)} passo${Math.abs(colDiff) > 1 ? 's' : ''} para a esquerda`);
+
+            if (instructions.length === 0) instructions.push("Você já está no destino!");
+        }
+
+        // Renderiza o grid
+        function renderGrid() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (i === peachRow && j === peachCol) {
+                        cell.classList.add('peach');
+                        cell.textContent = '🐶';
+                    } else if (gameOver && i === destRow && j === destCol) {
+                        cell.classList.add('destination');
+                        cell.textContent = locations[Math.floor(Math.random() * locations.length)];
+                    }
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Move a Peach
+        function movePeach(direction) {
+            if (gameOver) return;
+
+            let newRow = peachRow;
+            let newCol = peachCol;
+
+            if (direction === 'up' && peachRow > 0) newRow--;
+            else if (direction === 'down' && peachRow < gridSize - 1) newRow++;
+            else if (direction === 'left' && peachCol > 0) newCol--;
+            else if (direction === 'right' && peachCol < gridSize - 1) newCol++;
+            else return; // Movimento inválido
+
+            peachRow = newRow;
+            peachCol = newCol;
+            moves++;
+            document.getElementById('moves').textContent = `Movimentos: ${moves}`;
+            renderGrid();
+
+            // Verifica se chegou ao destino após o movimento
+            checkDestination();
+        }
+
+        // Verifica se a Peach chegou ao destino
+        function checkDestination() {
+            const feedbackElement = document.getElementById('feedback');
+            if (peachRow === destRow && peachCol === destCol) {
+                gameOver = true;
+                feedbackElement.innerHTML = '<img src="https://i.ibb.co/wN5N3mRH/IMG-1389.jpg" alt="Certo">';
+                document.getElementById('instructions').textContent = 'Parabéns! Você chegou ao destino!';
+                document.getElementById('restart-btn').style.display = 'inline-block';
+                feedbackElement.style.display = 'block';
+                renderGrid(); // Mostra o destino
+            } else if (moves >= Math.abs(destRow - peachRow) + Math.abs(destCol - peachCol)) {
+                gameOver = true;
+                feedbackElement.innerHTML = '<img src="https://i.ibb.co/hJBYqfPw/IMG-1390.jpg" alt="Errado">';
+                document.getElementById('instructions').textContent = 'Ops! Você não chegou ao destino.';
+                document.getElementById('restart-btn').style.display = 'inline-block';
+                feedbackElement.style.display = 'block';
+                renderGrid(); // Mostra o destino
+            }
+        }
+
+        // Reinicia o jogo
+        document.getElementById('restart-btn').addEventListener('click', initializeGame);
+
+        // Inicializa o jogo
+        initializeGame();
+    </script>
+</body>
+</html>
